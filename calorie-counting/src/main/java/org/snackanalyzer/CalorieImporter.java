@@ -1,4 +1,4 @@
-package org.example;
+package org.snackanalyzer;
 
 import java.io.File;
 import java.io.IOException;
