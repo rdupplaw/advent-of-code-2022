@@ -1,43 +1,38 @@
 package org.campcleanup;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 public class CampCleaner {
 
-  private final Object textParser;
+    private final RangePairParser rangePairParser;
 
-  public CampCleaner(Object textParser) {
-    this.textParser = textParser;
-  }
-
-  public void duplicateFinder() throws IOException, URISyntaxException {
-    // parse text into an array
-    List<RangeObject> listOfSections = new ArrayList<RangeObject>();
-
-    // load the data from file
-    var listOfSectionsString = Files.readAllLines(Paths.get(requireNonNull(getClass().getClassLoader().getResource("input.txt")).toURI()));
-
-    for(String string : listOfSectionsString) {
-      int end = 7;
-      int start = 9;
-      listOfSections.add(new RangeObject(end, start));
+    public CampCleaner(RangePairParser rangePairParser) {
+        this.rangePairParser = rangePairParser;
     }
 
-    // find the duplicates
-      // if the first element is
-  }
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        RangeParser rangeParser = new RangeParser();
+        RangePairParser rangePairParser = new RangePairParser(rangeParser);
+        CampCleaner campCleaner = new CampCleaner(rangePairParser);
+        System.out.println(campCleaner.duplicateFinder());
+    }
 
-  public static void main(String[] args) throws IOException, URISyntaxException {
-    CampCleaner campCleaner = new CampCleaner(null);
-    campCleaner.duplicateFinder();
-  }
+    public long duplicateFinder() throws IOException, URISyntaxException {
+        List<String> input = Files.readAllLines(Paths.get(requireNonNull(getClass().getClassLoader().getResource("input.txt")).toURI()));
+        List<RangePair> rangePairs = rangePairParser.getRangePairs(input);
+        return getNumberOfOverlappingRanges(rangePairs);
+    }
+
+    private long getNumberOfOverlappingRanges(List<RangePair> rangePairs) {
+        return rangePairs.stream()
+                .filter(RangePair::hasFullOverlap)
+                .count();
+    }
+
 }
